@@ -1,4 +1,4 @@
-package com.starsong;
+package com.starsong.board;
 
 import java.io.IOException;
 import java.util.*;
@@ -11,13 +11,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.starsong.boardDAO.BoardDAO;
-import com.starsong.boardVO.BoardVO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.starsong.board.BoardDAO;
 
 /**
  * Servlet implementation class board
  */
-public class BoardServlet extends HttpServlet {
+public class BoardService extends HttpServlet {
 	
 	BoardDAO boardDAO = new BoardDAO();
 	BoardVO boardVO;
@@ -27,7 +27,7 @@ public class BoardServlet extends HttpServlet {
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public BoardServlet() {
+	public BoardService() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -60,6 +60,14 @@ public class BoardServlet extends HttpServlet {
 
 	private void doService(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
+		
+		
+		ObjectMapper obhecMapper = new ObjectMapper();
+		String contentType = request.getContentType();
+		
+	
+		
 		// 한글 설정
 		request.setCharacterEncoding("utf-8");
 		String action = request.getParameter("action");

@@ -15,11 +15,22 @@
 
 	<servlet>
 		<servlet-name>board</servlet-name>
-		<servlet-class>com.starsong.BoardServlet</servlet-class>
+		<servlet-class>com.starsong.board.BoardServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>board</servlet-name>
 		<url-pattern>/board.do</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>userServlet</servlet-name>
+		<servlet-class>com.starsong.user.UserServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>userServlet</servlet-name>
+		<url-pattern>/user.do</url-pattern>
+	</servlet-mapping>
+
 </web-app>

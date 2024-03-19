@@ -1,9 +1,7 @@
-package com.starsong.boardDAO;
+package com.starsong.board;
 
 import java.sql.*;
 import java.util.*;
-
-import com.starsong.boardVO.BoardVO;
 
 public class BoardDAO {
 

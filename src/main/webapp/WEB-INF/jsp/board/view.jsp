@@ -51,6 +51,7 @@ tr:hover {
 }
 
 .codybutton a {
+
     display: inline-block;
     padding: 10px 20px;
     margin-right: 10px;

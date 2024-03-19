@@ -1,4 +1,4 @@
-package com.starsong.boardVO;
+package com.starsong.board;
 
 import java.util.Date;
 
