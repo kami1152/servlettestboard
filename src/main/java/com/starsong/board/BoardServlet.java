@@ -13,12 +13,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starsong.board.BoardDAO;
+import com.starsong.user.UserVO;
 
 /**
  * Servlet implementation class board
  */
 public class BoardServlet extends HttpServlet {
 
+	BoardController boardController = new BoardController();
 	BoardDAO boardDAO = new BoardDAO();
 	BoardVO boardVO;
 
@@ -57,88 +59,69 @@ public class BoardServlet extends HttpServlet {
 			throws ServletException, IOException {
 		doService(request, response);
 	}
+	
+	private Map<String, Object> convertMap(Map<String, String[]> map) {
+		Map<String, Object> result = new HashMap<>();
+
+		for (var entry : map.entrySet()) {
+			if (entry.getValue().length == 1) {
+				//문자열 1건  
+				result.put(entry.getKey(), entry.getValue()[0]);
+			} else {
+				//문자열 배열을 추가한다  
+				result.put(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		return result;
+	}
 
 	private void doService(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		ObjectMapper obhecMapper = new ObjectMapper();
+		ObjectMapper objectMapper = new ObjectMapper();
 		String contentType = request.getContentType();
-
+		BoardVO boardVO = null;
+		//json file 받기
+		if(contentType==null || contentType.startsWith("application/x-www-form-urlencoded")) {
+			boardVO = objectMapper.convertValue(convertMap(request.getParameterMap()), BoardVO.class);
+		} else if(contentType.startsWith("application/json")) {
+			boardVO = objectMapper.readValue(request.getInputStream(), BoardVO.class);
+		}
+		System.out.println("board :" + boardVO);
 		// 한글 설정
 		request.setCharacterEncoding("utf-8");
 
-		String action = request.getParameter("action");
-
-		String jspPage = switch (action) {
-		case "list" -> list(request, response);
-		case "insert" -> insert(request, response);
-		case "view" -> view(request, response);
-		case "delete" -> delete(request, response);
-		case "updateForm" -> updateForm(request, response);
-		case "update" -> update(request, response);
-
+		String action = boardVO.getAction();
+		System.out.println(action);
+		Object result =  switch (action) {
+		case "list" -> boardController.list(request, boardVO);
+		case "insert" -> boardController.insert(request, boardVO);
+		case "insertForm" -> boardController.insertForm(request, boardVO);
+		case "view" -> boardController.view(request, boardVO);
+		case "delete" -> boardController.delete(request, boardVO);
+		case "updateForm" -> boardController.updateForm(request, boardVO);
+		case "update" -> boardController.update(request, boardVO);
 		default -> "";
 		};
 		// 3. jsp 포워딩
-
-		if (jspPage.startsWith("redirect:")) {
-			response.sendRedirect(jspPage.substring("redirect:".length()));
-		} else {
-			// 포워딩
-			RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/jsp/board/" + action + ".jsp");
-			rd.forward(request, response);
+		if (result instanceof Map map) {
+			//json 문자열을 리턴 
+			response.setContentType("application/json;charset=UTF-8");
+			response.getWriter().append(objectMapper.writeValueAsString(map));
+		} else if (result instanceof String url) {
+			if (url.startsWith("redirect:")) {
+				//리다이렉트 
+				response.sendRedirect(url.substring("redirect:".length()));
+			} else {
+				//3. jsp 포워딩 
+				//포워딩 
+				RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/jsp/board/"+url+".jsp");
+				rd.forward(request, response);
+			}
 		}
 	}
 
-	private String updateForm(HttpServletRequest request, HttpServletResponse response) {
-		int bno = Integer.parseInt(request.getParameter("bno"));
-		BoardVO board = boardDAO.detail(bno);
-		request.setAttribute("board", board);
-		return "updateForm";
 
-	}
-
-	private String update(HttpServletRequest request, HttpServletResponse response) {
-		int bno = Integer.parseInt(request.getParameter("bno"));
-		BoardVO board = boardDAO.detail(bno);
-		board.setBtitle(request.getParameter("btitle"));
-		board.setBcontent(request.getParameter("bcontent"));
-		int updated = boardDAO.update(board);
-		request.setAttribute("updated", updated);
-		return "update";
-	}
-
-	private String delete(HttpServletRequest request, HttpServletResponse response) {
-		int bno = Integer.parseInt(request.getParameter("bno"));
-		int update = boardDAO.delete(bno);
-		request.setAttribute("update", update);
-		return "delete";
-	}
-
-	private String view(HttpServletRequest request, HttpServletResponse response) {
-		int bno = Integer.parseInt(request.getParameter("bno"));
-		BoardVO board = boardDAO.detail(bno);
-		request.setAttribute("board", board);
-		return "view";
-	}
-
-	private String insert(HttpServletRequest request, HttpServletResponse response) {
-		BoardVO board = new BoardVO();
-		board.setBtitle(request.getParameter("btitle"));
-		board.setBwriter(request.getParameter("bwriter"));
-		board.setBcontent(request.getParameter("bcontent"));
-		int updated = boardDAO.insert(board);
-		request.setAttribute("updated", updated);
-
-		return "redirect:board.do?action=list";
-	}
-
-	private String list(HttpServletRequest request, HttpServletResponse response) {
-
-		List<BoardVO> boardlist = boardDAO.list();
-		request.setAttribute("list", boardlist);
-
-		return "list";
-	}
 
 }

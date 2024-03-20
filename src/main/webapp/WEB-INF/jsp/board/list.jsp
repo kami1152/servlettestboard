@@ -38,7 +38,7 @@
 	<h1>게시글</h1>
 
     
-    <form id="listForm" action="board.do">
+    <form id="listForm" action="board.do" method="post">
     	<input type="hidden" id="action" name="action" value="view">
     	<input type="hidden" id="bno" name="bno" >
     </form>

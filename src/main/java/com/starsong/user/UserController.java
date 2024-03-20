@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,10 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.starsong.user.UserServlet;
-import com.starsong.user.UserVO;
-import com.starsong.user.UserDAO;
-
+import com.starsong.user.*;
 
 public class UserController {
 	private static final long serialVersionUID = 1L;
@@ -34,7 +32,7 @@ public class UserController {
         // TODO Auto-generated constructor stub
     }
 
-	public String list(HttpServletRequest request, UserVO user) throws ServletException, IOException {
+	public Object list(HttpServletRequest request, UserVO user) throws ServletException, IOException {
 		System.out.println("목록");
 		
 		//1. 처리
@@ -46,7 +44,7 @@ public class UserController {
 		return "list";
 	}
 	
-	public String view(HttpServletRequest request, UserVO user) throws ServletException, IOException {
+	public Object view(HttpServletRequest request, UserVO user) throws ServletException, IOException {
 		System.out.println("상세보기");
 		//String userid = request.getParameter("userid");
 		//1. 처리
@@ -56,18 +54,27 @@ public class UserController {
 		return "view";
 	}
 	
-	public String delete(HttpServletRequest request, UserVO user) throws ServletException, IOException {
+	public Object delete(HttpServletRequest request, UserVO user) throws ServletException, IOException {
 		System.out.println("삭제");
 		//1. 처리
 		int updated = userService.delete(user);
 		
-		//2. jsp출력할 값 설정
-		request.setAttribute("updated", updated);
+//		//2. jsp출력할 값 설정
+//		request.setAttribute("updated", updated);
+//		
+//		return "delete";
+		Map<String, Object> map = new HashMap<>();
+		if (updated == 1) { //성공
+			map.put("status", 0);
+		} else {
+			map.put("status", -99);
+			map.put("statusMessage", "회원 정보 삭제 실패하였습니다");
+		}
 		
-		return "delete";
+		return map;
 	}
 	
-	public String updateForm(HttpServletRequest request, UserVO user) throws ServletException, IOException {
+	public Object updateForm(HttpServletRequest request, UserVO user) throws ServletException, IOException {
 		System.out.println("수정화면");
 		//1. 처리
 		//usersDAO.read(user);
@@ -78,19 +85,28 @@ public class UserController {
 		return "updateForm"; 
 	}
 	
-	public String update(HttpServletRequest request, UserVO user) throws ServletException, IOException {
+	public Object update(HttpServletRequest request, UserVO user) throws ServletException, IOException {
 		System.out.println("수정");
 		
 		//1. 처리
 		int updated = userService.update(user);
 		
-		//2. jsp출력할 값 설정
-		request.setAttribute("updated", updated);
+//		//2. jsp출력할 값 설정
+//		request.setAttribute("updated", updated);
+//		
+//		return "update";
+		Map<String, Object> map = new HashMap<>();
+		if (updated == 1) { //성공
+			map.put("status", 0);
+		} else {
+			map.put("status", -99);
+			map.put("statusMessage", "회원 정보 수정 실패하였습니다");
+		}
 		
-		return "update";
+		return map;
 	}
 	
-	public String insertForm(HttpServletRequest request) throws ServletException, IOException {
+	public Object insertForm(HttpServletRequest request) throws ServletException, IOException {
 		System.out.println("등록화면");
 		//1. 처리
 		
@@ -98,19 +114,28 @@ public class UserController {
 		return "insertForm";
 	}
 	
-	public String insert(HttpServletRequest request, UserVO user) throws ServletException, IOException {
+	public Object insert(HttpServletRequest request, UserVO user) throws ServletException, IOException {
 		System.out.println("등록");
+		Map<String, Object> map = new HashMap<>();
 		
-		//1. 처리
-		int updated = userService.insert(user);
-		
-		//2. jsp출력할 값 설정
-		request.setAttribute("updated", updated);
-		
-		return "redirect:user.do?action=list";
+		if (user.getUserid() == null  || user.getUserid().length() == 0) {
+			map.put("status", -1);
+			map.put("statusMessage", "사용자 아이디는 null 이거나 길이가 0인 문자열을 사용할 수 없습니다");
+		} else {
+			//1. 처리
+			int updated = userService.insert(user);
+			
+			if (updated == 1) { //성공
+				map.put("status", 0);
+			} else {
+				map.put("status", -99);
+				map.put("statusMessage", "회원 가입이 실패하였습니다");
+			}
+		}
+		return map;
 	}
 
-	public String existUserId(HttpServletRequest request, UserVO userVO) throws ServletException, IOException {
+	public Object existUserId(HttpServletRequest request, UserVO userVO) throws ServletException, IOException {
 		//1. 처리
 		System.out.println("existUserId userid->" + userVO.getUserid());
 		UserVO existUser = userService.view(userVO);
@@ -122,8 +147,7 @@ public class UserController {
 		} else { //사용 불가능 아아디 
 			map.put("existUser", true);
 		}
-		ObjectMapper objectMapper = new ObjectMapper();
-		return objectMapper.writeValueAsString(map);
+		return map;
 	}
 	
 }

@@ -28,19 +28,30 @@ public class BoardDAO {
 		}
 	}
 
-	public List<BoardVO> list() {
+	public List<BoardVO> list(BoardVO sboard) {
 		List<BoardVO> list = new ArrayList<>();
-
 		try {
-			String sql = "SELECT bno,BTITLE ,BWRITER ,BDATE  FROM boards ORDER BY bno asc";
-			Pstmt = conn.prepareStatement(sql);
-			ResultSet rs = Pstmt.executeQuery();
+			ResultSet rs;
+			if(sboard.getSearchkey() != null) {
+				System.out.println("11");
+				String sql="SELECT bno,BTITLE ,BWRITER ,BDATE  FROM boards where bno = ? ORDER BY bno asc";
+				Pstmt = conn.prepareStatement(sql);
+				Pstmt.setInt(1, sboard.getBno());
+				rs = Pstmt.executeQuery();
+				
+			}else {
+				String sql = "SELECT bno,BTITLE ,BWRITER ,BDATE  FROM boards ORDER BY bno asc";
+				System.out.println("22");
+				Pstmt = conn.prepareStatement(sql);
+				rs = Pstmt.executeQuery();
+			}
 			while (rs.next()) {
 				BoardVO board = new BoardVO();
 				board.setBno(rs.getInt("bno"));
 				board.setBtitle(rs.getString("btitle"));
 				board.setBwriter(rs.getString("BWRITER"));
 				board.setBdate(rs.getDate("BDATE"));
+				System.out.println("list"+ board);
 				list.add(board);
 			}
 			rs.close();
@@ -50,7 +61,8 @@ public class BoardDAO {
 		return list;
 	}
 
-	public BoardVO detail(int bno) {
+	public BoardVO detail(BoardVO sboard) {
+		int bno = sboard.getBno();
 		BoardVO board = new BoardVO();
 		try {
 			String sql = "SELECT * FROM BOARDS WHERE bno = ?";
@@ -72,7 +84,8 @@ public class BoardDAO {
 		return board;
 	}
 
-	public int delete(int bno) {
+	public int delete(BoardVO board) {
+		int bno = board.getBno();
 		int updated = 0;
 		try {
 			String sql = "delete from boards where bno=?";

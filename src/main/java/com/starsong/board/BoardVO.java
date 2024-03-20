@@ -11,4 +11,8 @@ public class BoardVO{
 	private String bcontent;
 	private String bwriter;
 	private Date bdate;
+	
+	private String searchkey;
+	
+	private String action;
 }

@@ -37,7 +37,7 @@
 <body>
 	<h1>회원목록</h1>
 	  
-    <form id="searchForm" action="list.jsp" method="get" >
+    <form id="searchForm" action="user.do" method="get" >
     	<label>이름 : </label>
     	<input type="text" id="searchKey" name="searchKey" value="${param.searchKey}">
     	<input type="submit" value="검색">
