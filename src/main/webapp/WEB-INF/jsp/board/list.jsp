@@ -36,7 +36,7 @@
 </head>
 <body>
 	<h1>게시글</h1>
-
+	<h3>로그인 : ${loginVO.username} </h3>
     
     <form id="listForm" action="board.do" method="post">
     	<input type="hidden" id="action" name="action" value="view">

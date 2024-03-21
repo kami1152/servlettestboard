@@ -6,13 +6,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.UUID;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -148,6 +151,68 @@ public class UserController {
 			map.put("existUser", true);
 		}
 		return map;
+	}
+
+	public Object loginForm(HttpServletRequest request) {
+		return "loginForm";
+	}
+	
+	public String login(HttpServletRequest request, UserVO userVO,HttpServletResponse response) throws ServletException, IOException {
+		UserVO loginVO = userService.view(userVO);
+		
+		if (userVO.isEqualPassword(loginVO)) {
+			//로그인 사용자의 정보를 세션에 기록한다
+			HttpSession session = request.getSession();
+			session.setAttribute("loginVO", loginVO);
+			session.setMaxInactiveInterval(30*60*1000);
+
+			if (userVO.getAutologin().equals("Y")) {
+				String uuid = UUID.randomUUID().toString();
+				userVO.setUseruuid(uuid);
+
+				userService.updateUUID(userVO);
+
+
+				//2. uuid값을 쿠키에 기록한다
+				Cookie uuidCookie = new Cookie("uuidCookie", uuid);
+				uuidCookie.setMaxAge(24 * 60 * 60); //24시간
+				uuidCookie.setPath("/");
+
+				response.addCookie(uuidCookie);
+
+			}
+		} else {
+			//map.put("statusMessage", "아이디 또는 비밀번호가 잘못되었습니다");
+			return "redirect:user.do?action=loginForm&err=invalidUserId";
+		}
+		return "redirect:board.do?action=list";
+	}
+
+	public Object logout(HttpServletRequest request) {
+		Map<String, Object> map = new HashMap<>();
+		
+		//로그인 사용자의 정보를 세션에 제거한다
+		HttpSession session = request.getSession();
+		System.out.println("logout session id = " + session.getId());
+		session.removeAttribute("loginVO"); //특정 이름을 제거한다
+		session.invalidate(); //세션에 저장된 모든 자료를 삭제한다 
+		map.put("status", 0);
+		
+		return map;
+	}
+	public Object mypage(HttpServletRequest request, UserVO user) throws ServletException, IOException {
+		System.out.println("상세보기");
+		//String userid = request.getParameter("userid");
+		//1. 처리
+//		HttpSession session = request.getSession();
+//		UserVO loginVO = (UserVO) session.getAttribute("loginVO");
+//		if (loginVO == null) {
+//			return "redirect:user.do?action=loginForm";
+//		}
+//
+//		//2. jsp출력할 값 설정
+//		request.setAttribute("loginVO", loginVO);
+		return "mypage";
 	}
 	
 }

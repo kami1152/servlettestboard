@@ -5,57 +5,22 @@
 <title>Insert title here</title>
 </head>
 <body>
+<script type="text/javascript" src="js/common.js"></script>
 <script type="text/javascript">
-//함수 선언 
-function add(a, b) {
-	return a + b;
-}	
 
-let result = add(10, 20);
-
-const add2 = (a, b) => {
-	return a + b;
+function jsLogout() {
+	
+	myFetch("user.do", {action : "logout"}, json => {
+		if(json.status == 0) {
+			//성공
+			alert("로그아웃되었습니다");
+			location = "board.do?action=list";
+		} else {
+			alert(json.statusMessage);
+		}
+	});
+			
 }
-
-console.log("add2(10,20) = ", add2(10,20));
-
-const add3 = (a, b) => a + b;
-
-console.log("add3(10,20) = ", add3(10,20));
-
-
-add4 = function(a, b) {
-	return a + b;
-}
-
-console.log("add4(10,20) = ", add4(10,20));
-
-const add5 = function(a, b) {
-	return a + b;
-}
-
-console.log("add5(10,20) = ", add5(10,20));
-
-const person = {
-	firstName : "홍"
-	, lastName : "길동"
-	, age : 10
-};
-console.log("person.firstName = ", person.firstName);
-console.log("person['firstName'] = ", person["firstName"]);
-console.log('person["firstName"] = ', person['firstName']);
-
-const person2 = {
-	firstName : "홍"
-	, lastName : "길동"
-	, age : 10
-	, output : function() {
-		console.log("firstName = ", this.firstName);
-	}
-};
-
-console.log("person2.firstName = ", person2.firstName);
-person2.output();
 
 function jsClick() {
 	document.getElementById('demo').innerHTML=Date();	
@@ -63,8 +28,12 @@ function jsClick() {
 
 </script>
 <ul>
+<li><a href="user.do?action=mypage">마이페이지</a></li>
+	<li><a href="user.do?action=loginForm">로그인양식</a></li>
+	<li><a href="javascript:jsLogout()">로그아웃</a></li>
 	<li><a href="board.do?action=list">게시물 목록</a></li>
 	<li><a href="user.do?action=list">유저 목록</a></li>
+	<li><a href="user.do?action=loginForm">로그인 폼</a></li>
 </ul>
 
 

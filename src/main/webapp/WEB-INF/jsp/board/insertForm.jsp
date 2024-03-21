@@ -19,11 +19,12 @@ input {
 </head>
 <body>
 	<h1>글 등록양식</h1>
+	<h3>로그인 : ${loginVO.username} </h3>
 	<form id="rForm" action="board.do">
 		<input type="hidden" name="action" value="insert"> <label>제목:
 		</label> <input type="text" id="btitle" name="btitle"> <br /> <label>내용
-			: </label> <input type="text" id="bcontent" name="bcontent"><br /> <label>글쓴이
-			: </label> <input type="text" id="bwriter" name="bwriter"><br />
+			: </label> <input type="text" id="bcontent" name="bcontent"><br /> 
+			 <input type="hidden" id="bwriter" name="bwriter" value="${loginVO.username}"><br />
 		<div>
 			<input type="submit" value="등록"> <a
 				href="board.do?action=list">취소</a>
@@ -44,6 +45,8 @@ input {
 				if(json.status == 0){
 					alert("성공")
 					location = "board.do?action=list";
+				}else{
+					alert(json.statusMessage);
 				}
 			});
 		});

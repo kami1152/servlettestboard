@@ -24,52 +24,58 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class UserServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-      
-	UserController userController = new UserController(); 
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public UserServlet() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+
+	UserController userController = new UserController();
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public UserServlet() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		doService(request, response);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		doService(request, response);
 	}
+
 	private Map<String, Object> convertMap(Map<String, String[]> map) {
 		Map<String, Object> result = new HashMap<>();
 
 		for (var entry : map.entrySet()) {
 			if (entry.getValue().length == 1) {
-				//문자열 1건  
+				// 문자열 1건
 				result.put(entry.getKey(), entry.getValue()[0]);
 			} else {
-				//문자열 배열을 추가한다  
+				// 문자열 배열을 추가한다
 				result.put(entry.getKey(), entry.getValue());
 			}
 		}
-		
+
 		return result;
 	}
 
-	
-	//공통 처리 함수 
-	private void doService(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		//한글 설정 
+	// 공통 처리 함수
+	private void doService(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		// 한글 설정
 		request.setCharacterEncoding("utf-8");
 		String contentType = request.getContentType();
-		
+
 		ObjectMapper objectMapper = new ObjectMapper();
 		UserVO userVO = null;
 		if (contentType == null || contentType.startsWith("application/x-www-form-urlencoded")) {
@@ -78,9 +84,9 @@ public class UserServlet extends HttpServlet {
 			userVO = objectMapper.readValue(request.getInputStream(), UserVO.class);
 		}
 		System.out.println("userVO " + userVO);
-		
 		String action = userVO.getAction();
-		Object result = switch(action) {
+		System.out.println(action);
+		Object result = switch (action) {
 		case "list" -> userController.list(request, userVO);
 		case "view" -> userController.view(request, userVO);
 		case "delete" -> userController.delete(request, userVO);
@@ -89,21 +95,25 @@ public class UserServlet extends HttpServlet {
 		case "insertForm" -> userController.insertForm(request);
 		case "insert" -> userController.insert(request, userVO);
 		case "existUserId" -> userController.existUserId(request, userVO);
+		case "loginForm" -> userController.loginForm(request);
+		case "login" -> userController.login(request, userVO,response);
+		case "logout" -> userController.logout(request);
+		case "mypage" -> userController.mypage(request, userVO);
 		default -> "";
 		};
-		
+
 		if (result instanceof Map map) {
-			//json 문자열을 리턴 
+			// json 문자열을 리턴
 			response.setContentType("application/json;charset=UTF-8");
 			response.getWriter().append(objectMapper.writeValueAsString(map));
 		} else if (result instanceof String url) {
 			if (url.startsWith("redirect:")) {
-				//리다이렉트 
+				// 리다이렉트
 				response.sendRedirect(url.substring("redirect:".length()));
 			} else {
-				//3. jsp 포워딩 
-				//포워딩 
-				RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/jsp/user/"+url+".jsp");
+				// 3. jsp 포워딩
+				// 포워딩
+				RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/jsp/user/" + url + ".jsp");
 				rd.forward(request, response);
 			}
 		}

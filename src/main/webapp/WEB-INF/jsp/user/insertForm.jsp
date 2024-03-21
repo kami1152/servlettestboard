@@ -20,6 +20,7 @@
     <h1>
         회원정보 등록양식 
     </h1>
+    
     <form id="rForm" action="user.do" method="post" >
     	<input type="hidden" name="action" value="insert">
         <label>아이디 : </label> <input type="text" id="userid" name="userid" required="required"> 

@@ -5,6 +5,7 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UserVO {
 	private String userid;
 	private String userpassword;
@@ -16,6 +17,10 @@ public class UserVO {
 	//실행 명령 필드 
 	private String action;
 
+	
+	//uuid
+	private String useruuid;
+	private String autologin;
 	//검색키
 	private String searchKey;
 	
@@ -30,6 +35,9 @@ public class UserVO {
 	
 	public boolean isEmptySearchKey() {
 		return searchKey == null || searchKey.length() == 0; 
+	}
+	public boolean isEqualPassword(UserVO userVO) {
+		return userVO != null && userpassword.equals(userVO.getUserpassword());
 	}
 	
 }

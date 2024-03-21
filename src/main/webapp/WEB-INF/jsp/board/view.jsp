@@ -92,9 +92,11 @@ tr:hover {
 	<form id="viewForm" method="post" action="board.do">
 		<input type="hidden" id="action" name="action" value=""> <input
 			type="hidden" id="bno" name="bno" value="${board.bno}"> <input
-			type="button" value="삭제" onclick="jsDelete()"> <input
-			type="button" value="수정" onclick="jsUpdateForm()">
+			type="hidden" id="loginVO" name="loginVO" value="${loginVO.userid}">
+		<input type="button" value="삭제" onclick="jsDelete()"> <input
+			type="button" value="수정" id="updateButton" onclick="jsUpdateForm()">
 	</form>
+	<h3>${loginVO.userid}</h3>
 </body>
 
 <script type="text/javascript" src="<c:url value='/js/common.js'/>"></script>
@@ -116,6 +118,12 @@ function jsDelete() {
 	}
 }
 function jsUpdateForm() {
+	
+	var loginVO = document.getElementById("loginVO").value;
+	var updateButton = document.getElementById("updateButton");
+	 if (!loginVO) {
+	        updateButton.style.display = "none";
+	    }
 	if (confirm("정말로 수정하시겠습니까?")) {
 		//서버의 URL을 설정한다 
 		action.value = "updateForm";
